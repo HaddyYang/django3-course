@@ -1,0 +1,13 @@
+1、安装virtualenv
+pip install virtualenv
+
+2、创建虚拟环境
+virtualenv <环境名称>
+
+3、启动虚拟环境
+Windows：<环境目录>/Scripts/activate
+Linux/Macs：source <环境目录>/bin/activate
+
+4、退出虚拟环境
+Windows：<环境目录>/Scripts/deactivate.bat
+Linux/Macs：deactivate
