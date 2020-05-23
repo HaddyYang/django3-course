@@ -31,6 +31,7 @@ Django是Python的一种web框架，需要Python才可使用。<br>
 01.什么是Django<br>
 02.Django是如何工作的<br>
 03.开始项目构思<br>
+04.本地简单登录<br>
 
 ## 交流
 **QQ群：701914136**<br>
