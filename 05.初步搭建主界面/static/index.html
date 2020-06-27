@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>在线聊天系统 | 登录</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <form class="login-form" action="./main.html" method="POST" onsubmit="return login()">
+            <h1>在线聊天系统</h1>
+            <input type="text" name="nickname" required="true" />
+            <input type="submit" value="登录" />
+        </form>
+
+        <style>
+            * {
+                margin: 0; padding: 0;
+            }
+            body {
+                background: #efefef;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .login-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 6em;
+            }
+            input[type="text"] {
+                width: 20em;
+                margin-top: 1em;
+                height: 2em;
+            }
+            input[type="submit"] {
+                margin-top: 0.5em;
+                width: 20em;
+                padding: 0.5em 0;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                background: #009688;
+                color: #fff;
+            }
+        </style>
+
+        <script type="text/javascript">
+            function login() {
+                var element = document.getElementsByName('nickname')[0];
+                var nickname = element.value;
+                localStorage.setItem('nickname', nickname);
+                return true;
+            }
+
+            // 加载页面时，判断是否设置了昵称
+            window.onload = function () {
+                var nickname = localStorage.getItem('nickname');
+                if (nickname) {
+                    window.location.href = './main.html';
+                }
+            }
+        </script>
+    </body>
+</html>
