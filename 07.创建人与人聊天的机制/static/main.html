@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>在线聊天系统</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span id="hello_text"></span>
+            <button onclick="quit()">注销</button>    
+        </div>
+        <div class="body">
+            <div class="firend-list"></div>
+            <div class="chat">
+                <div class="chat-main"></div>
+                <div class="chat-send">
+                    <textarea class="chat-input" onkeydown="inputKeyDown(event)"></textarea>
+                    <div class="chat-send-bottom">
+                        <span class="chat-send-tip">Enter发送, Ctrl + Enter换行</span>
+                        <button class="chat-send-btn" onclick="sendMessageBtn()">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <script type="text/javascript">
+        var ws;  // WebSocket连接对象
+        var ws_url = 'ws://localhost:8000/';
+        // 消息内容显示
+        var chat_main = document.getElementsByClassName('chat-main')[0];
+
+        window.onload = function () {
+            var nickname = localStorage.getItem('nickname');
+            if (nickname) {
+                // 昵称存在，则显示昵称
+                var element = document.getElementById('hello_text');
+                element.innerText = nickname + '，欢迎使用在线聊天系统';
+
+                // 建立WebSocket连接
+                var auth = localStorage.getItem('auth');
+                console.log(ws_url + '?auth=' + auth);
+                ws = new WebSocket(ws_url + '?auth=' + auth);
+                // 定义事件
+                ws.onopen = function(e) {
+                    console.log('WebSocket建立连接成功');
+                    addMessage('系统通知: 和服务器建立连接成功');
+                }
+                ws.onmessage = function(e) {
+                    console.log('WebSocket收到消息:', e.data);
+                    addMessage('收到消息: ' + e.data);
+                }
+                ws.onclose = function(e) {
+                    console.log('WebSocket连接中断');
+                    addMessage('系统通知: 和服务器连接断开');
+                }
+                ws.onerror = function(e) {
+                    console.log('WebSocket错误', e);
+                    addMessage('系统通知: 发生错误, 连接中断');
+                }
+            }
+            else {
+                // 昵称不存在，跳转到登录页面
+                window.location.href = './index.html';
+            }
+        }
+
+        // "发送"按钮点击事件
+        function sendMessageBtn() {
+            // 获取文本内容
+            var input = document.getElementsByClassName('chat-input')[0];
+            var text = input.value;
+
+            // 发送文本消息
+            var result = sendMessage(text);
+            if (result) {
+                addMessage('发送消息: ' + text);
+                input.value = '';
+            }
+        }
+
+        // 输入框的键盘按下事件
+        function inputKeyDown(event) {
+            //console.log(event);
+            // 判定是否按下回车键
+            if (event.keyCode == 13) {
+                var input = event.target;
+                var text = input.value;
+
+                if (event.ctrlKey) {
+                    // Ctrl + Enter 换行
+                    input.value = text + '\n';
+                }
+                else {
+                    // 阻止默认行为
+                    event.preventDefault();
+                    // Enter 发送消息
+                    
+                    // 发送消息
+                    var result = sendMessage(text);
+                    if (result) {
+                        addMessage('发送消息: ' + text);
+                        input.value = '';
+                    }
+                }
+            }
+        }
+
+        // 发送消息的函数
+        function sendMessage(text) {
+            if (!ws) {return false;}
+            if (ws.readyState != ws.OPEN) {return false;}
+            if (text == '') {return false;}
+            ws.send(text);
+            return true;
+        }
+
+        // 把消息加入到聊天界面
+        function addMessage(text) {
+            var message = document.createElement('p');
+            message.innerText = text;
+            chat_main.appendChild(message);
+        }
+
+        // 注销函数
+        function quit () {
+            // 关闭WebSocket
+            if (ws) {
+                if (ws.readyState == ws.OPEN) {
+                    ws.close();
+                }
+            }
+            // 跳转页面
+            localStorage.removeItem('nickname');
+            window.location.href = './index.html';
+        }
+    </script>
+
+    <style type="text/css">
+        * { margin: 0; padding: 0; }
+        body {
+            background: #d2d2d2;
+        }
+        .container {
+            /*自身的样式*/
+            width: 70%;
+            min-width: 500px;
+            margin: 5vh auto 0;
+            box-shadow: #b9b9b9 0 0 6px 4px;
+            background-color: white;
+            border-radius: 6px;
+            overflow: hidden;
+            /*内部元素的布局*/
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 6px 0;
+            text-align: center;
+        }
+        .body {
+            /*自身样式*/
+            height: 86vh;
+            border-top: 1px solid #aaa;
+            /*内部元素的布局方式*/
+            display: flex;
+        }
+        .body .firend-list {
+            border-right: 1px solid #aaa;
+            background: #eee;
+            width: 20%;
+            min-width: 200px;
+        }
+        .body .chat {
+            background: #eee;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .body .chat .chat-main {
+            flex-grow: 1;
+        }
+        .body .chat .chat-send {
+            height: 200px; 
+            border-top: 2px solid #ccc; 
+            display: flex; 
+            flex-direction: column;
+        }
+        .body .chat-send .chat-input {
+            resize: none;
+            flex-grow: 1;
+            border: none;
+            padding: 0.5em;
+            font-size: large;
+        }
+        .body .chat-send .chat-input:focus {
+            outline: none;
+        }
+        .body .chat-send .chat-send-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5em;
+            font-size: small;
+            color: #bdbdbd;
+            background: #fff;
+        }
+        .body .chat-send-bottom .chat-send-btn {
+            padding: 0.2em 1em;
+        }
+    </style>
+</body>
+</html>

@@ -34,6 +34,7 @@ Django是Python的一种web框架，需要Python才可使用。<br>
 04.本地简单登录<br>
 05.初步搭建主界面<br>
 06.建立WebSocket连接<br>
+07.创建人与人聊天的机制<br>
 
 ## 交流
 **QQ群：701914136**<br>

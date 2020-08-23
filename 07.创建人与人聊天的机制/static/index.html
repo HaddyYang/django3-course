@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>在线聊天系统 | 登录</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <form class="login-form" action="./main.html" method="POST" onsubmit="return login()">
+            <h1>在线聊天系统</h1>
+            <input type="text" name="nickname" required="true" />
+            <input type="submit" value="登录" />
+        </form>
+
+        <style>
+            * {
+                margin: 0; padding: 0;
+            }
+            body {
+                background: #efefef;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .login-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 6em;
+            }
+            input[type="text"] {
+                width: 20em;
+                margin-top: 1em;
+                height: 2em;
+            }
+            input[type="submit"] {
+                margin-top: 0.5em;
+                width: 20em;
+                padding: 0.5em 0;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                background: #009688;
+                color: #fff;
+            }
+        </style>
+
+        <script type="text/javascript" src="./libs/jquery-3.5.1.min.js"></script>
+        <script type="text/javascript">
+            function login() {
+                var element = document.getElementsByName('nickname')[0];
+                var nickname = element.value;
+                var success = false;
+
+                // 调用服务器的登录接口，得到唯一标识：auth
+                var data = {
+                    nickname: nickname
+                };
+                $.ajax({
+                    url: 'http://localhost:8000/login/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    cache: false,
+                    async: false,
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.status == 1) {
+                            // 记录唯一标识到本地
+                            localStorage.setItem('auth', result.auth);
+                            localStorage.setItem('nickname', nickname);
+                            success = true;
+                        }
+                        else {
+                            alert(result.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error(xhr);
+                    }
+                });
+                return success;
+            }
+
+            // 加载页面时，判断是否设置了昵称
+            window.onload = function () {
+                var nickname = localStorage.getItem('nickname');
+                if (nickname) {
+                    window.location.href = './main.html';
+                }
+            }
+        </script>
+    </body>
+</html>
